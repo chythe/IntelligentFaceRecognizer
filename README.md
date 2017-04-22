@@ -3,6 +3,7 @@
 
 ## 2. Użycie biblioteki do wykrywania nosa oczu i ust.
 + [Kompilacja OpenCV do jar i przykład wykrywania twarzy](http://docs.opencv.org/3.1.0/d9/d52/tutorial_java_dev_intro.html)
++ [Plugin ze spakowanym OpenCV](https://github.com/openpnp/opencv)
 
 
 ## 3. Napisać klasę wyliczajacą paramety do nauki sieci neuronowej
