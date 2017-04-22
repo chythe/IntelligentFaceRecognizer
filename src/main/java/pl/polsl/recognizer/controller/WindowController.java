@@ -5,27 +5,15 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Callback;
+import pl.polsl.recognizer.model.FaceParameterizer;
 import pl.polsl.recognizer.view.Dialog;
 
 /**
@@ -33,6 +21,23 @@ import pl.polsl.recognizer.view.Dialog;
  */
 public class WindowController implements Initializable {
 
+    /**
+     * Handle to a TextFiled object, representing a text filed for entering input picture path.
+     */
+    @FXML
+    private TextField inputPicturePathTextField;
+
+    /**
+     * Handle to a Button object, representing a browse option.
+     */
+    @FXML
+    private Button browseButton;
+
+    /**
+     * Handle to a Button object, representing a detect face option.
+     */
+    @FXML
+    private Button detectFaceButton;
 
     /**
      * Handle to a Button object, representing a help option.
@@ -60,29 +65,6 @@ public class WindowController implements Initializable {
 
     }
 
-
-    /**
-     * Action on selected menu option: "Exit".
-     */
-    @FXML
-    public void exitMenuItemOnAction() {
-        Dialog dialogs = new Dialog();
-        Optional<ButtonType> result =
-                dialogs.getExitConfirmDialogAlert().showAndWait();
-        if (result.get() == ButtonType.OK){
-            Platform.exit();
-            System.exit(0);
-        }
-    }
-
-    /**
-     * Action on clicked button: "Help".
-     */
-    @FXML
-    public void helpButtonOnAction() {
-
-    }
-
     /**
      * The method returns event handler to display confirm dialog window.
      * @return event handler to display confirm dialog window
@@ -102,5 +84,56 @@ public class WindowController implements Initializable {
                     windowEvent.consume();
             }
         };
+    }
+
+
+    /**
+     * Action on selected menu option: "Exit".
+     */
+    @FXML
+    public void exitMenuItemOnAction() {
+        Dialog dialogs = new Dialog();
+        Optional<ButtonType> result =
+                dialogs.getExitConfirmDialogAlert().showAndWait();
+        if (result.get() == ButtonType.OK){
+            Platform.exit();
+            System.exit(0);
+        }
+    }
+
+    /**
+     * Action on selected menu option: "Browse".
+     */
+    @FXML
+    public void browseButtonOnAction() {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+        fileChooser.getExtensionFilters().add(extFilter);
+        File file = fileChooser.showOpenDialog(new Stage());
+        if (file != null) {
+            inputPicturePathTextField.setText(file.getAbsolutePath());
+        }
+    }
+
+    /**
+     * Action on clicked button: "Detect Face".
+     */
+    @FXML
+    public void detectFaceButtonOnAction() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDirectory = directoryChooser.showDialog(new Stage());
+        if (selectedDirectory != null) {
+            FaceParameterizer faceParameterizer = new FaceParameterizer();
+            faceParameterizer.detectFace(inputPicturePathTextField.getText(), selectedDirectory.getAbsolutePath() + "\\output.png");
+        }
+    }
+
+    /**
+     * Action on clicked button: "Help".
+     */
+    @FXML
+    public void helpButtonOnAction() {
+
     }
 }
