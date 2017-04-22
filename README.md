@@ -2,15 +2,15 @@
 
 
 ## 2. Użycie biblioteki do wykrywania nosa oczu i ust.
-+ [Kompilacja OpenCV do jar i przykład wykrywania twarzy] (http://docs.opencv.org/3.1.0/d9/d52/tutorial_java_dev_intro.html)
++ [Kompilacja OpenCV do jar i przykład wykrywania twarzy](http://docs.opencv.org/3.1.0/d9/d52/tutorial_java_dev_intro.html)
 
 
 ## 3. Napisać klasę wyliczajacą paramety do nauki sieci neuronowej
 
 
 ## 4. Stworzyć sieć neuronową i ją nauczyć
-+ [Obsługa sieci neuronowej] (http://neuroph.sourceforge.net/Getting%20Started%20with%20Neuroph%202.7.pdf)
-+ [Algorytm nauki sieci neuronowej] (http://neuroph.sourceforge.net/tutorials/FaceRecognition/FaceRecognitionUsingNeuralNetwork.html)
++ [Obsługa sieci neuronowej](http://neuroph.sourceforge.net/Getting%20Started%20with%20Neuroph%202.7.pdf)
++ [Algorytm nauki sieci neuronowej](http://neuroph.sourceforge.net/tutorials/FaceRecognition/FaceRecognitionUsingNeuralNetwork.html)
 
 
 ## 5. Napisanie GUI z podawaniem obrazka z pliku
