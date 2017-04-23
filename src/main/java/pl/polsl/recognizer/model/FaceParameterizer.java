@@ -24,8 +24,8 @@ public class FaceParameterizer {
         System.out.println("\nRunning DetectFace");
         // Create a face detector from the cascade file in the resources
         // directory.
-        CascadeClassifier faceDetector = new CascadeClassifier(getClass().getResource("/lbpcascade_frontalface.xml").getPath());
-        Mat image = Imgcodecs.imread(getClass().getResource(inputFilePath).getPath());
+        CascadeClassifier faceDetector = new CascadeClassifier("src/main/resources/lbpcascades/lbpcascade_frontalface.xml");
+        Mat image = Imgcodecs.imread(inputFilePath);
         // Detect faces in the image.
         // MatOfRect is a special container class for Rect.
         MatOfRect faceDetections = new MatOfRect();
