@@ -1,20 +1,53 @@
 package pl.polsl.recognizer.model;
 
 import org.neuroph.core.NeuralNetwork;
+import org.neuroph.core.learning.DataSet;
+import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.Perceptron;
+import org.neuroph.util.TransferFunctionType;
 
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by chythe on 2017-04-22.
  */
 public class RecognizerNeuralNetwork {
 
-    private NeuralNetwork neuralNetwork;
+    private MultiLayerPerceptron neuralNetwork;
+    private DataSet trainingSet;
 
     public RecognizerNeuralNetwork() {
-        this.neuralNetwork = NeuralNetwork.load("FaceRecognizerPerceptron.nnet");
-        if (null == neuralNetwork)
-            neuralNetwork = new Perceptron(2, 1);
+    }
+
+    public void learnNeuralNetwork(String inputFilePath) {
+        int columnCount = 0;
+        int rowCount = 0;
+        Scanner scan;
+        File file = new File(inputFilePath);
+        List<double[]> facesParameters = new ArrayList();
+        try {
+            scan = new Scanner(file);
+            while(scan.hasNextDouble()) {
+                if (0 == columnCount)
+                    facesParameters.add(new double[8]);
+                facesParameters.get(rowCount)[columnCount] = scan.nextDouble();
+                if (++columnCount >= 8) {
+                    columnCount = 0;
+                    rowCount++;
+                }
+            }
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.TANH, 8, 3, 15);
+        trainingSet = new DataSet(8, 15);
+        facesParameters.forEach(t -> {
+            trainingSet.addRow(t);
+        });
+        neuralNetwork.learn(trainingSet);
     }
 }

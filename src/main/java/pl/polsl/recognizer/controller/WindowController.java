@@ -14,6 +14,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import pl.polsl.recognizer.model.FaceParameterizer;
+import pl.polsl.recognizer.model.RecognizerNeuralNetwork;
 import pl.polsl.recognizer.view.Dialog;
 
 /**
@@ -108,7 +109,7 @@ public class WindowController implements Initializable {
     public void browseButtonOnAction() {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+                new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
         fileChooser.getExtensionFilters().add(extFilter);
         File file = fileChooser.showOpenDialog(new Stage());
         if (file != null) {
@@ -121,12 +122,14 @@ public class WindowController implements Initializable {
      */
     @FXML
     public void detectFaceButtonOnAction() {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File selectedDirectory = directoryChooser.showDialog(new Stage());
-        if (selectedDirectory != null) {
-            FaceParameterizer faceParameterizer = new FaceParameterizer();
-            faceParameterizer.detectFace(inputPicturePathTextField.getText(), selectedDirectory.getAbsolutePath() + "\\output.png");
-        }
+        RecognizerNeuralNetwork rocognizer = new RecognizerNeuralNetwork();
+        rocognizer.learnNeuralNetwork(inputPicturePathTextField.getText());
+//        DirectoryChooser directoryChooser = new DirectoryChooser();
+//        File selectedDirectory = directoryChooser.showDialog(new Stage());
+//        if (selectedDirectory != null) {
+//            FaceParameterizer faceParameterizer = new FaceParameterizer();
+//            faceParameterizer.detectFace(inputPicturePathTextField.getText(), selectedDirectory.getAbsolutePath() + "\\output.png");
+//        }
     }
 
     /**
