@@ -9,6 +9,7 @@ import org.neuroph.util.TransferFunctionType;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -39,15 +40,24 @@ public class RecognizerNeuralNetwork {
                     columnCount = 0;
                     rowCount++;
                 }
+                if (++columnCount >= 16) {
+                    columnCount = 0;
+                    rowCount++;
+                }
             }
         } catch (FileNotFoundException e1) {
             e1.printStackTrace();
         }
-        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.TANH, 8, 3, 15);
+        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 8, 3, 15);
         trainingSet = new DataSet(8, 15);
-        facesParameters.forEach(t -> {
-            trainingSet.addRow(t);
-        });
+        Iterator<double[]> trainingSetIterator = trainingSet.iterator();
+//        Iterator<short[]> resultSetIterator = resultSet.iterator();
+        while (trainingSetIterator.hasNext() /* && resultSetIterator.hasNext()*/) {
+            trainingSet.addRow(trainingSetIterator.next());
+        }
+//        facesParameters.forEach(t -> {
+//            trainingSet.addRow(t);
+//        });
         neuralNetwork.learn(trainingSet);
     }
 }
