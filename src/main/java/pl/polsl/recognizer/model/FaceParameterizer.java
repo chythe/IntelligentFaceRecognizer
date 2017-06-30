@@ -1,10 +1,14 @@
 package pl.polsl.recognizer.model;
 
-import org.opencv.core.*;
-import nu.pattern.OpenCV;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
+import org.openimaj.image.FImage;
+import org.openimaj.image.processing.face.detection.FaceDetector;
+import org.openimaj.image.processing.face.detection.keypoints.FKEFaceDetector;
+import org.openimaj.image.processing.face.detection.keypoints.FacialKeypoint;
+import static org.openimaj.image.processing.face.detection.keypoints.FacialKeypoint.FacialKeypointType.*;
+import org.openimaj.image.processing.face.detection.keypoints.KEDetectedFace;
+import pl.polsl.recognizer.exception.NoFaceException;
+import java.awt.image.BufferedImage;
+import java.util.List;
 
 
 /**
@@ -12,35 +16,50 @@ import org.opencv.objdetect.CascadeClassifier;
  */
 public class FaceParameterizer {
 
-    static {
-        OpenCV.loadLocally();
-    }
-
-    public FaceParameterizer() {
-
-    }
-
-    public void detectFace(String inputFilePath, String outputFilePath) {
-        System.out.println("\nRunning DetectFace");
-        // Create a face detector from the cascade file in the resources
-        // directory.
-        CascadeClassifier faceDetector = new CascadeClassifier("src/main/resources/haarcascades/haarcascade_eye.xml");
-        Mat image = Imgcodecs.imread(inputFilePath);
-        // Detect faces in the image.
-        // MatOfRect is a special container class for Rect.
-        MatOfRect faceDetections = new MatOfRect();
-        faceDetector.detectMultiScale(image, faceDetections);
-        System.out.println(String.format("Detected %s faces", faceDetections.toArray().length));
-        // Draw a bounding box around each face.
-        for (Rect rect : faceDetections.toArray()) {
-            Imgproc.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0));
+    public static Face detectFace(BufferedImage bufferedImage) throws NoFaceException {
+        final int[] data = bufferedImage.getRGB(0, 0, bufferedImage.getWidth(),
+                bufferedImage.getHeight(), null, 0, bufferedImage.getWidth());
+        final FImage imajImage = new FImage(data, bufferedImage.getWidth(), bufferedImage.getHeight());
+        FaceDetector<KEDetectedFace, FImage> faceDetector = new FKEFaceDetector();
+        List<KEDetectedFace> detectedFaces = faceDetector.detectFaces(imajImage);
+        if (!detectedFaces.isEmpty()) {
+            FacialKeypoint[] facialKeypoints = detectedFaces.get(0).getKeypoints();
+            if (facialKeypoints.length >= 9)
+                return calculateDistances(facialKeypoints);
         }
-        // Save the visualized detection.
-        System.out.println(String.format("Writing %s", outputFilePath));
-        Imgcodecs.imwrite(outputFilePath, image);
+        throw new NoFaceException();
     }
 
-    public static String GetOpenCVVersion() {
-        return Core.VERSION;
+    private static Face calculateDistances(FacialKeypoint[] facialKeypoints) {
+        double eyeLeftCenterX = (facialKeypoints[EYE_LEFT_LEFT.ordinal()].position.x
+                + facialKeypoints[EYE_LEFT_RIGHT.ordinal()].position.x) / 2;
+        double eyeLeftCenterY = (facialKeypoints[EYE_LEFT_LEFT.ordinal()].position.y
+                + facialKeypoints[EYE_LEFT_RIGHT.ordinal()].position.y) / 2;
+        double eyeRightCenterX = (facialKeypoints[EYE_RIGHT_LEFT.ordinal()].position.x
+                + facialKeypoints[EYE_RIGHT_RIGHT.ordinal()].position.x) / 2;
+        double eyeRightCenterY = (facialKeypoints[EYE_RIGHT_LEFT.ordinal()].position.y
+                + facialKeypoints[EYE_RIGHT_RIGHT.ordinal()].position.y) / 2;
+        double mouthCenterX = (facialKeypoints[MOUTH_LEFT.ordinal()].position.x
+                + facialKeypoints[MOUTH_RIGHT.ordinal()].position.x) / 2;
+        double mouthCenterY = (facialKeypoints[MOUTH_LEFT.ordinal()].position.y
+                + facialKeypoints[MOUTH_RIGHT.ordinal()].position.y) / 2;
+        double distanceEyes = Math.hypot(eyeLeftCenterX - eyeRightCenterX, eyeLeftCenterY - eyeRightCenterY);
+        double distanceLeftEyeMouth = Math.hypot(eyeLeftCenterX - mouthCenterX, eyeLeftCenterY - mouthCenterY);
+        double distanceRightEyeMouth = Math.hypot(eyeRightCenterX - mouthCenterX, eyeRightCenterY - mouthCenterX);
+        double distanceLeftEyeNose = Math.hypot(eyeLeftCenterX - facialKeypoints[NOSE_MIDDLE.ordinal()].position.x,
+                eyeLeftCenterY - facialKeypoints[NOSE_MIDDLE.ordinal()].position.y);
+        double distanceRightEyeNose = Math.hypot(eyeRightCenterX - facialKeypoints[NOSE_MIDDLE.ordinal()].position.x,
+                eyeRightCenterY - facialKeypoints[NOSE_MIDDLE.ordinal()].position.y);
+        double distanceMouthNose = Math.hypot(mouthCenterX - facialKeypoints[NOSE_MIDDLE.ordinal()].position.x,
+                mouthCenterY - facialKeypoints[NOSE_MIDDLE.ordinal()].position.y);
+        double distanceEyesNose = Math.hypot((eyeLeftCenterX + eyeRightCenterX) / 2
+                        - facialKeypoints[NOSE_MIDDLE.ordinal()].position.x,
+                (eyeLeftCenterY + eyeRightCenterY) / 2
+                        - facialKeypoints[NOSE_MIDDLE.ordinal()].position.y);
+        double widthNose = Math.hypot(
+                facialKeypoints[NOSE_LEFT.ordinal()].position.x - facialKeypoints[NOSE_RIGHT.ordinal()].position.x,
+                facialKeypoints[NOSE_LEFT.ordinal()].position.y - facialKeypoints[NOSE_RIGHT.ordinal()].position.y);
+        return new Face(distanceEyes, distanceLeftEyeMouth, distanceRightEyeMouth, distanceLeftEyeNose,
+                distanceRightEyeNose, distanceMouthNose, distanceEyesNose, widthNose);
     }
 }

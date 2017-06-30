@@ -24,17 +24,28 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.openimaj.image.FImage;
+import org.openimaj.image.ImageUtilities;
+import org.openimaj.image.colour.RGBColour;
 import org.openimaj.image.processing.face.detection.DetectedFace;
+import org.openimaj.image.processing.face.detection.FaceDetector;
+import org.openimaj.image.processing.face.detection.HaarCascadeDetector;
+import org.openimaj.image.processing.face.detection.keypoints.FKEFaceDetector;
+import org.openimaj.image.processing.face.detection.keypoints.FacialKeypoint;
+import org.openimaj.image.processing.face.detection.keypoints.KEDetectedFace;
 import org.openimaj.math.geometry.shape.Rectangle;
+import pl.polsl.recognizer.exception.NoFaceException;
 import pl.polsl.recognizer.model.FaceParameterizer;
 import pl.polsl.recognizer.model.RecognizerNeuralNetwork;
 import pl.polsl.recognizer.view.Dialog;
@@ -71,6 +82,12 @@ public class WindowController implements Initializable {
     @FXML
     ImageView recognizeFaceImageView;
 
+    @FXML
+    Tab addTab;
+
+    @FXML
+    TabPane tanPane;
+
     private BufferedImage bufferedImage;
 
     private Webcam webCam = null;
@@ -79,10 +96,7 @@ public class WindowController implements Initializable {
 
     private ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
 
-    private DetectedFace detectedface = null;
-
     public WindowController() {
-
     }
 
     private class WebCamInfo {
@@ -115,7 +129,7 @@ public class WindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        addFaceButton.setDisable(true);
         ObservableList<WebCamInfo> options = FXCollections.observableArrayList();
         int webCamCounter = 0;
         for (Webcam webcam : Webcam.getWebcams()) {
@@ -127,7 +141,6 @@ public class WindowController implements Initializable {
         }
         addTabCameraComboBox.setItems(options);
         addTabCameraComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<WebCamInfo>() {
-
             @Override
             public void changed(ObservableValue<? extends WebCamInfo> arg0, WebCamInfo arg1, WebCamInfo arg2) {
                 if (arg2 != null) {
@@ -139,12 +152,9 @@ public class WindowController implements Initializable {
     }
 
     protected void initializeWebCam(final int webCamIndex) {
-
         Task<Void> webCamIntilizer = new Task<Void>() {
-
             @Override
             protected Void call() throws Exception {
-
                 if (webCam == null) {
                     webCam = Webcam.getWebcams().get(webCamIndex);
                     webCam.open();
@@ -158,51 +168,38 @@ public class WindowController implements Initializable {
             }
 
         };
-        addFaceButton.setDisable(true);
-
         new Thread(webCamIntilizer).start();
     }
 
     protected void startWebCamStream() {
         stopCamera = false;
         Task<Void> task = new Task<Void>() {
-
             @Override
             protected Void call() throws Exception {
-
                 while (!stopCamera) {
                     try {
                         if ((bufferedImage = webCam.getImage()) != null) {
-
                             Platform.runLater(new Runnable() {
-
                                 @Override
                                 public void run() {
-                                    final Image image = SwingFXUtils
+                                    final Image fxImage = SwingFXUtils
                                             .toFXImage(bufferedImage, null);
-//                                    final FImage fImage = ImageUtilities
-                                    imageProperty.set(image);
-
+                                    imageProperty.set(fxImage);
                                 }
                             });
-
                             bufferedImage.flush();
-
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-
                 return null;
             }
-
         };
         Thread th = new Thread(task);
         th.setDaemon(true);
         th.start();
         addFaceImageView.imageProperty().bind(imageProperty);
-
     }
 
     @FXML
@@ -210,14 +207,25 @@ public class WindowController implements Initializable {
         if (stopCamera) {
             stopCamera = false;
             startWebCamStream();
+            addFaceButton.setDisable(true);
         } else {
+            addFaceButton.setDisable(false);
             stopCamera = true;
         }
     }
 
     @FXML
-    public void addFaceOnAcrion() {
-
+    public void addFaceOnAction() {
+        try {
+            RecognizerNeuralNetwork.getInstance().addFace(
+                    FaceParameterizer.detectFace(bufferedImage));
+        } catch (NoFaceException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText("No Face on Camera View");
+            alert.setContentText("Please Take Next One");
+            alert.showAndWait();
+        }
     }
 
     @FXML

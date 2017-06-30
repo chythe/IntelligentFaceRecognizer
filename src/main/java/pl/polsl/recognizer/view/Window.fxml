@@ -52,9 +52,9 @@
         </VBox>
     </top>
     <center>
-        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="Add Face">
+                <Tab fx:id="addTab" text="Add Face">
                     <content>
 
                     </content>
@@ -74,7 +74,7 @@
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </HBox.margin>
                               </Button>
-                              <Button fx:id="addFaceButton" mnemonicParsing="false" onAction="#addFaceOnAcrion" text="Add Face" />
+                              <Button fx:id="addFaceButton" mnemonicParsing="false" onAction="#addFaceOnAction" text="Add Face" />
                            </children>
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

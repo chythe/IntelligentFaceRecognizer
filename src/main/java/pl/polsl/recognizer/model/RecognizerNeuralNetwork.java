@@ -19,9 +19,31 @@ import java.util.Scanner;
 public class RecognizerNeuralNetwork {
 
     private MultiLayerPerceptron neuralNetwork;
+
     private DataSet trainingSet;
 
-    public RecognizerNeuralNetwork() {
+    private static RecognizerNeuralNetwork instance = null;
+
+
+    protected RecognizerNeuralNetwork() {
+
+    }
+
+    public static RecognizerNeuralNetwork getInstance() {
+        if(instance == null) {
+            instance = new RecognizerNeuralNetwork();
+        }
+        return instance;
+    }
+
+    public void addFace(Face face) {
+        System.out.println(face.toString());
+        // TODO
+    }
+
+    public String recognizeFace() {
+        // TODO
+        return "Mati";
     }
 
     public void learnNeuralNetwork(String inputFilePath) {
@@ -45,8 +67,8 @@ public class RecognizerNeuralNetwork {
                     rowCount++;
                 }
             }
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
         neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, 8, 3, 15);
         trainingSet = new DataSet(8, 15);
