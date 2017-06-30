@@ -6,6 +6,8 @@
     Version     : 1.0
 -->
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -52,34 +54,69 @@
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="Tab1">
+                <Tab text="Add Face">
                     <content>
 
                     </content>
                <content>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                      <children>
+                        <ComboBox fx:id="addTabCameraComboBox" prefWidth="150.0" promptText="Choose Camera">
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </ComboBox>
+                        <ImageView fx:id="addFaceImageView" fitHeight="206.0" fitWidth="562.0" pickOnBounds="true" preserveRatio="true" />
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <Label fx:id="inputPicturePathLabel" text="Input Picture Path:" />
-                              <TextField fx:id="inputPicturePathTextField" />
-                              <Button fx:id="browseButton" mnemonicParsing="false" onAction="#browseButtonOnAction" text="Browse" />
+                              <Button fx:id="addTabCameraButton" mnemonicParsing="false" onAction="#addTabCameraOnAction" text="Stop Camera">
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button fx:id="addFaceButton" mnemonicParsing="false" onAction="#addFaceOnAcrion" text="Add Face" />
                            </children>
-                        </HBox>
-                        <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
-                           <children>
-                              <Button id="detectFaceButton" fx:id="detectFaceButton" mnemonicParsing="false" onAction="#detectFaceButtonOnAction" text="Detect Face" />
-                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
                         </HBox>
                      </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
                   </VBox>
                </content>
                 </Tab>
-                <Tab text="Tab2">
-                    <content>
-
-                    </content>
-                </Tab>
+            <Tab text="Recognize Face">
+               <content>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <ComboBox fx:id="recognizeTabCameraComboBox" prefWidth="150.0" promptText="Choose Camera">
+                           <VBox.margin>
+                              <Insets bottom="10.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </ComboBox>
+                        <ImageView fx:id="recognizeFaceImageView" fitHeight="206.0" fitWidth="562.0" pickOnBounds="true" preserveRatio="true" />
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button fx:id="recognizeTabCameraButton" mnemonicParsing="false" onAction="#recognizeTabCameraOnAction" text="Stop Camera">
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button fx:id="recognizeFaceButton" mnemonicParsing="false" onAction="#recognizeFaceOnAction" text="Recognize Face" />
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </Tab>
             </tabs>
         </TabPane>
     </center>
