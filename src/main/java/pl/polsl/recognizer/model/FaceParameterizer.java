@@ -10,10 +10,6 @@ import pl.polsl.recognizer.exception.NoFaceException;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-
-/**
- * Created by chythe on 2017-04-22.
- */
 public class FaceParameterizer {
 
     public static Face detectFace(BufferedImage bufferedImage) throws NoFaceException {

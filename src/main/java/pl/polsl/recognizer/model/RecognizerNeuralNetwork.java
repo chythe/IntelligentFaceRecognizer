@@ -1,21 +1,14 @@
 package pl.polsl.recognizer.model;
 
-import org.neuroph.core.NeuralNetwork;
 import org.neuroph.core.learning.DataSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.nnet.Perceptron;
 import org.neuroph.util.TransferFunctionType;
-
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * Created by chythe on 2017-04-22.
- */
 public class RecognizerNeuralNetwork {
 
     private MultiLayerPerceptron neuralNetwork;
@@ -24,10 +17,7 @@ public class RecognizerNeuralNetwork {
 
     private static RecognizerNeuralNetwork instance = null;
 
-
-    protected RecognizerNeuralNetwork() {
-
-    }
+    protected RecognizerNeuralNetwork() {}
 
     public static RecognizerNeuralNetwork getInstance() {
         if(instance == null) {

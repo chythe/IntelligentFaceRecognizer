@@ -1,16 +1,9 @@
 package pl.polsl.recognizer.controller;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
-
 import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamPanel;
-import com.github.sarxos.webcam.WebcamResolution;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -20,39 +13,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.openimaj.image.FImage;
-import org.openimaj.image.ImageUtilities;
-import org.openimaj.image.colour.RGBColour;
-import org.openimaj.image.processing.face.detection.DetectedFace;
-import org.openimaj.image.processing.face.detection.FaceDetector;
-import org.openimaj.image.processing.face.detection.HaarCascadeDetector;
-import org.openimaj.image.processing.face.detection.keypoints.FKEFaceDetector;
-import org.openimaj.image.processing.face.detection.keypoints.FacialKeypoint;
-import org.openimaj.image.processing.face.detection.keypoints.KEDetectedFace;
-import org.openimaj.math.geometry.shape.Rectangle;
 import pl.polsl.recognizer.exception.NoFaceException;
 import pl.polsl.recognizer.model.FaceParameterizer;
 import pl.polsl.recognizer.model.RecognizerNeuralNetwork;
-import pl.polsl.recognizer.view.Dialog;
 
-/**
- * Created by chythe on 2017-04-22.
- */
 public class WindowController implements Initializable {
 
     @FXML
@@ -96,8 +68,7 @@ public class WindowController implements Initializable {
 
     private ObjectProperty<Image> imageProperty = new SimpleObjectProperty<Image>();
 
-    public WindowController() {
-    }
+    public WindowController() {}
 
     private class WebCamInfo {
 
@@ -129,6 +100,7 @@ public class WindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        addTabCameraButton.setDisable(true);
         addFaceButton.setDisable(true);
         ObservableList<WebCamInfo> options = FXCollections.observableArrayList();
         int webCamCounter = 0;
@@ -164,6 +136,7 @@ public class WindowController implements Initializable {
                     webCam.open();
                 }
                 startWebCamStream();
+                addTabCameraButton.setDisable(false);
                 return null;
             }
 
@@ -206,11 +179,13 @@ public class WindowController implements Initializable {
     public void addTabCameraOnAction() {
         if (stopCamera) {
             stopCamera = false;
-            startWebCamStream();
             addFaceButton.setDisable(true);
+            addTabCameraButton.setText("Stop Camera");
+            startWebCamStream();
         } else {
-            addFaceButton.setDisable(false);
             stopCamera = true;
+            addFaceButton.setDisable(false);
+            addTabCameraButton.setText("Start Camera");
         }
     }
 
@@ -230,6 +205,7 @@ public class WindowController implements Initializable {
 
     @FXML
     public void recognizeTabCameraOnAction() {
+        // TODO
 //        if (stopCamera) {
 //            stopCamera = false;
 //            startWebCamStream();
@@ -240,18 +216,18 @@ public class WindowController implements Initializable {
 
     @FXML
     public void recognizeFaceOnAction() {
-
+        // TODO
     }
 
     public static EventHandler<WindowEvent> confirmDialogCloseRequest() {
         return new EventHandler<WindowEvent>() {
-
             @Override
             public void handle(WindowEvent windowEvent) {
-                Dialog dialogs = new Dialog();
-                Optional<ButtonType> result =
-                        dialogs.getExitConfirmDialogAlert().showAndWait();
-                if (result.get() == ButtonType.OK){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Exit");
+                alert.setHeaderText("Confirm");
+                alert.setContentText("Are you sure you want to exit?");
+                if (alert.showAndWait().get() == ButtonType.OK){
                     Platform.exit();
                     System.exit(0);
                 } else
@@ -262,29 +238,19 @@ public class WindowController implements Initializable {
 
     @FXML
     public void exitMenuItemOnAction() {
-        Dialog dialogs = new Dialog();
-        Optional<ButtonType> result =
-                dialogs.getExitConfirmDialogAlert().showAndWait();
-        if (result.get() == ButtonType.OK){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit");
+        alert.setHeaderText("Confirm");
+        alert.setContentText("Are you sure you want to exit?");
+        if (alert.showAndWait().get() == ButtonType.OK){
             Platform.exit();
             System.exit(0);
         }
     }
 
-//    @FXML
-//    public void browseButtonOnAction() {
-//        FileChooser fileChooser = new FileChooser();
-//        FileChooser.ExtensionFilter extFilter =
-//                new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-//        fileChooser.getExtensionFilters().add(extFilter);
-//        File file = fileChooser.showOpenDialog(new Stage());
-//        if (file != null) {
-//            inputPicturePathTextField.setText(file.getAbsolutePath());
-//        }
-//    }
-
     @FXML
     public void recognizeFaceButtonOnAction() {
+        // TODO
 //        RecognizerNeuralNetwork rocognizer = new RecognizerNeuralNetwork();
 //        rocognizer.learnNeuralNetwork(inputPicturePathTextField.getText());
 //        DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -297,6 +263,6 @@ public class WindowController implements Initializable {
 
     @FXML
     public void helpButtonOnAction() {
-
+        // TODO
     }
 }

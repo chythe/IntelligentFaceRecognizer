@@ -1,13 +1,6 @@
 package pl.polsl.recognizer.model;
 
-import java.util.List;
-
-/**
- * Created by chythe on 2017-04-22.
- */
 public class Face {
-
-    public static final short NUM_OF_FACE_PARAMS = 8;
 
     private double distanceEyes;
 
