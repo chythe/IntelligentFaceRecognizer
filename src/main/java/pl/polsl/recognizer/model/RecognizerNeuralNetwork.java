@@ -1,5 +1,7 @@
 package pl.polsl.recognizer.model;
 
+import org.neuroph.core.NeuralNetwork;
+import org.neuroph.core.exceptions.VectorSizeMismatchException;
 import org.neuroph.core.learning.DataSet;
 import org.neuroph.core.learning.DataSetRow;
 import org.neuroph.nnet.MultiLayerPerceptron;
@@ -7,11 +9,12 @@ import org.neuroph.util.TransferFunctionType;
 import pl.polsl.recognizer.exception.NoFaceException;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class RecognizerNeuralNetwork {
 
-    private MultiLayerPerceptron neuralNetwork;
+    private NeuralNetwork neuralNetwork;
 
     private DataSet trainingSet;
 
@@ -29,15 +32,21 @@ public class RecognizerNeuralNetwork {
             neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,
                     Face.NUM_OF_FACE_PARAMS, faces.size());
         } else {
+            int middleNeuronsInLayers = Math.round(faces.size() / 3);
+            if (middleNeuronsInLayers < 2)
+                middleNeuronsInLayers = 2;
             neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,
-                    Face.NUM_OF_FACE_PARAMS, Math.round(faces.size() / 3), faces.size());
+                    Face.NUM_OF_FACE_PARAMS, middleNeuronsInLayers, faces.size());
         }
         trainingSet = new DataSet(Face.NUM_OF_FACE_PARAMS, faces.size());
-        double min = getMinParam(faces);
-        double max = getMaxParam(faces);
+//        double min = getMinParam(faces);
+//        double max = getMaxParam(faces);
         for (int i = 0; i < faces.size(); i++) {
-            trainingSet.addRow(new DataSetRow(normalize(faces.get(i).getAll(), min, max), generateResult(i, faces.size())));
+            trainingSet.addRow(new DataSetRow(
+                    normalize(faces.get(i).getAll(), faces.get(i).getMinParam(), faces.get(i).getMaxParam()),
+                    generateResult(i, faces.size())));
         }
+        System.out.println("Start neural network learning");
         neuralNetwork.learn(trainingSet);
         neuralNetwork.save("intelligent_face_recognizer.nnet");
         long endTime = System.nanoTime();
@@ -47,9 +56,18 @@ public class RecognizerNeuralNetwork {
 
     public String recognizeFace(Face face) throws NoFaceException {
         long startTime = System.nanoTime();
+        neuralNetwork = new NeuralNetwork();
         if (neuralNetwork.load("intelligent_face_recognizer.nnet") == null)
             throw new NoFaceException("No neural network file");
-//        neuralNetwork.
+        try {
+            // TODO tu leci wyjątek
+            neuralNetwork.setInput(new DataSetRow(normalize(face.getAll(), face.getMinParam(), face.getMaxParam())).getInput());
+        } catch (VectorSizeMismatchException e) {
+            e.printStackTrace();
+        }
+        neuralNetwork.calculate();
+        System.out.print("Input: " + Arrays.toString(normalize(face.getAll(), face.getMinParam(), face.getMaxParam())));
+        System.out.println(" Output: " + Arrays.toString(neuralNetwork.getOutput()) );
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
         System.out.println("Recognize face time: " + duration / 1000000 / 1000 + " seconds (" + duration / 1000000 + " milliseconds).");
@@ -78,7 +96,7 @@ public class RecognizerNeuralNetwork {
 
     private double[] normalize(double[] numbers, double min, double max) {
         for (int i = 0; i < numbers.length; i++)
-            numbers[i] = (numbers[i] - min)/ (max - min);
+            numbers[i] = (numbers[i] - min) / (max - min);
         return numbers;
     }
 

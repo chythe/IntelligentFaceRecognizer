@@ -3,6 +3,7 @@ package pl.polsl.recognizer.controller;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import com.github.sarxos.webcam.Webcam;
 import javafx.application.Platform;
@@ -187,18 +188,30 @@ public class WindowController implements Initializable {
 
     @FXML
     public void addFaceOnAction() {
-        try {
-            Face face = FaceParameterizer.detectFace(bufferedImage);
-            DatabaseConnector.getInstance().addFace(face);
-            List<Face> faces = DatabaseConnector.getInstance().getAllFaces();
-            RecognizerNeuralNetwork.getInstance().addFace(faces);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Information");
-            alert.setHeaderText("Face added to the database");
-            alert.showAndWait();
-        } catch (NoFaceException e) {
-            showNoFaceWarning(e.getMessage());
-        }
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Enter Name\n");
+            dialog.setHeaderText("Enter Name\n");
+            dialog.setContentText("Please, enter the name:");
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent((p) -> {
+                try {
+                    if (!result.get().isEmpty()) {
+                        Face face = FaceParameterizer.detectFace(bufferedImage);
+                        face.setName(result.get());
+                        DatabaseConnector.getInstance().addFace(face);
+                        List<Face> faces = DatabaseConnector.getInstance().getAllFaces();
+                        RecognizerNeuralNetwork.getInstance().addFace(faces);
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Information");
+                        alert.setHeaderText("Face added to the database");
+                        alert.showAndWait();
+                    } else {
+                        showWarning("No name");
+                    }
+                } catch(NoFaceException e){
+                    showWarning(e.getMessage());
+                }
+        });
     }
 
     @FXML
@@ -213,19 +226,11 @@ public class WindowController implements Initializable {
             alert.setContentText(name);
             alert.showAndWait();
         } catch (NoFaceException e) {
-            showNoFaceWarning(e.getMessage());
+            showWarning(e.getMessage());
         }
-//        RecognizerNeuralNetwork rocognizer = new RecognizerNeuralNetwork();
-//        rocognizer.learnNeuralNetwork(inputPicturePathTextField.getText());
-//        DirectoryChooser directoryChooser = new DirectoryChooser();
-//        File selectedDirectory = directoryChooser.showDialog(new Stage());
-//        if (selectedDirectory != null) {
-//            FaceParameterizer faceParameterizer = new FaceParameterizer();
-//            faceParameterizer.detectFace(inputPicturePathTextField.getText(), selectedDirectory.getAbsolutePath() + "\\output.png");
-//        }
     }
 
-    private void showNoFaceWarning(String message) {
+    private void showWarning(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
         alert.setHeaderText(message);
