@@ -13,7 +13,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(
-                new File("src/main/resources/fxml/pl/polsl/recognizer/view/Window.fxml").toURI().toURL());
+                new File("src/main/resources/pl/polsl/recognizer/view/Window.fxml").toURI().toURL());
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Intelligent Face Recognizer");

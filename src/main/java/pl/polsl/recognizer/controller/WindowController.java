@@ -113,10 +113,10 @@ public class WindowController implements Initializable {
         }
         addTabCameraComboBox.setItems(options);
         addTabCameraComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<WebCamInfo>() {
+
             @Override
             public void changed(ObservableValue<? extends WebCamInfo> arg0, WebCamInfo arg1, WebCamInfo arg2) {
                 if (arg2 != null) {
-                    System.out.println("WebCam Index: " + arg2.getWebCamIndex() + ": WebCam Name:" + arg2.getWebCamName());
                     initializeWebCam(arg2.getWebCamIndex());
                 }
             }
@@ -124,7 +124,8 @@ public class WindowController implements Initializable {
     }
 
     protected void initializeWebCam(final int webCamIndex) {
-        Task<Void> webCamIntilizer = new Task<Void>() {
+        Task<Void> webCamInitializerTask = new Task<Void>() {
+
             @Override
             protected Void call() throws Exception {
                 if (webCam == null) {
@@ -141,18 +142,20 @@ public class WindowController implements Initializable {
             }
 
         };
-        new Thread(webCamIntilizer).start();
+        new Thread(webCamInitializerTask).start();
     }
 
     protected void startWebCamStream() {
         stopCamera = false;
-        Task<Void> task = new Task<Void>() {
+        Task<Void> webCamTask = new Task<Void>() {
+
             @Override
             protected Void call() throws Exception {
                 while (!stopCamera) {
                     try {
                         if ((bufferedImage = webCam.getImage()) != null) {
                             Platform.runLater(new Runnable() {
+
                                 @Override
                                 public void run() {
                                     final Image fxImage = SwingFXUtils
@@ -169,9 +172,9 @@ public class WindowController implements Initializable {
                 return null;
             }
         };
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
+        Thread thread = new Thread(webCamTask);
+        thread.setDaemon(true);
+        thread.start();
         addFaceImageView.imageProperty().bind(imageProperty);
     }
 
@@ -221,6 +224,7 @@ public class WindowController implements Initializable {
 
     public static EventHandler<WindowEvent> confirmDialogCloseRequest() {
         return new EventHandler<WindowEvent>() {
+
             @Override
             public void handle(WindowEvent windowEvent) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
