@@ -2,6 +2,7 @@ package pl.polsl.recognizer.controller;
 
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import com.github.sarxos.webcam.Webcam;
 import javafx.application.Platform;
@@ -20,7 +21,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.WindowEvent;
+import pl.polsl.recognizer.database.DatabaseConnector;
 import pl.polsl.recognizer.exception.NoFaceException;
+import pl.polsl.recognizer.model.Face;
 import pl.polsl.recognizer.model.FaceParameterizer;
 import pl.polsl.recognizer.model.RecognizerNeuralNetwork;
 
@@ -185,8 +188,10 @@ public class WindowController implements Initializable {
     @FXML
     public void addFaceOnAction() {
         try {
-            RecognizerNeuralNetwork.getInstance().addFace(
-                    FaceParameterizer.detectFace(bufferedImage));
+            Face face = FaceParameterizer.detectFace(bufferedImage);
+            DatabaseConnector.getInstance().addFace(face);
+            List<Face> faces = DatabaseConnector.getInstance().getAllFaces();
+            RecognizerNeuralNetwork.getInstance().addFace(faces);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information");
             alert.setHeaderText("Face added to the database");
@@ -200,8 +205,8 @@ public class WindowController implements Initializable {
     public void recognizeFaceOnAction() {
         // TODO
         try {
-            String name = RecognizerNeuralNetwork.getInstance().recognizeFace(
-                    FaceParameterizer.detectFace(bufferedImage));
+            Face face = FaceParameterizer.detectFace(bufferedImage);
+            String name = RecognizerNeuralNetwork.getInstance().recognizeFace(face);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information");
             alert.setHeaderText("Face was recognized as:");

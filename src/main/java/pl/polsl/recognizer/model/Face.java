@@ -2,6 +2,10 @@ package pl.polsl.recognizer.model;
 
 public class Face {
 
+    public static final short NUM_OF_FACE_PARAMS = 8;
+
+    private String name;
+
     private double distanceEyes;
 
     private double distanceLeftEyeMouth;
@@ -36,7 +40,27 @@ public class Face {
         this.widthNose = widthNose;
     }
 
-    double[] getAll() {
+    public Face(String name,
+                double distanceEyes,
+                double distanceLeftEyeMouth,
+                double distanceRightEyeMouth,
+                double distanceLeftEyeNose,
+                double distanceRightEyeNose,
+                double distanceMouthNose,
+                double distanceEyesNose,
+                double widthNose) {
+        this.name = name;
+        this.distanceEyes = distanceEyes;
+        this.distanceLeftEyeMouth = distanceLeftEyeMouth;
+        this.distanceRightEyeMouth = distanceRightEyeMouth;
+        this.distanceLeftEyeNose = distanceLeftEyeNose;
+        this.distanceRightEyeNose = distanceRightEyeNose;
+        this.distanceMouthNose = distanceMouthNose;
+        this.distanceEyesNose = distanceEyesNose;
+        this.widthNose = widthNose;
+    }
+
+    public double[] getAll() {
         double[] allParameters = {
                 distanceEyes,
                 distanceLeftEyeMouth,
@@ -48,6 +72,34 @@ public class Face {
                 widthNose
         };
         return allParameters;
+    }
+
+    public double getMinParam() {
+        double[] params = getAll();
+        double min = params[0];
+        for (int i = 1; i < params.length; i++) {
+            if (params[i] < min)
+                min = params[i];
+        }
+        return min;
+    }
+
+    public double getMaxParam() {
+        double[] params = getAll();
+        double max = params[0];
+        for (int i = 1; i < params.length; i++) {
+            if (params[i] > max)
+                max = params[i];
+        }
+        return max;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getDistanceEyes() {
