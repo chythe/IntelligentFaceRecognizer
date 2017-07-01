@@ -1,102 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.polsl.recognizer.controller.WindowController">
-    <top>
-        <VBox BorderPane.alignment="CENTER">
-            <children>
-                <MenuBar>
-                    <menus>
-                        <Menu mnemonicParsing="false" text="File">
-                            <items>
-                                <SeparatorMenuItem mnemonicParsing="false" />
-                                <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" onAction="#exitMenuItemOnAction" text="Exit" />
-                            </items>
-                        </Menu>
-                    </menus>
-                </MenuBar>
-            </children>
-        </VBox>
-    </top>
-    <center>
-        <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-            <tabs>
-                <Tab fx:id="addTab" text="Add Face">
-                    <content>
-
-                    </content>
-               <content>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ComboBox fx:id="addTabCameraComboBox" prefWidth="150.0" promptText="Choose Camera">
-                           <VBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </VBox.margin>
-                        </ComboBox>
-                        <ImageView fx:id="addFaceImageView" fitHeight="206.0" fitWidth="562.0" pickOnBounds="true" preserveRatio="true" />
-                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                           <children>
-                              <Button fx:id="addTabCameraButton" mnemonicParsing="false" onAction="#addTabCameraOnAction" text="Stop Camera">
-                                 <HBox.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button fx:id="addFaceButton" mnemonicParsing="false" onAction="#addFaceOnAction" text="Add Face" />
-                           </children>
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                        </HBox>
-                     </children>
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </padding>
-                  </VBox>
-               </content>
-                </Tab>
-            <Tab text="Recognize Face">
-               <content>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <ComboBox fx:id="recognizeTabCameraComboBox" prefWidth="150.0" promptText="Choose Camera">
-                           <VBox.margin>
-                              <Insets bottom="10.0" right="10.0" top="10.0" />
-                           </VBox.margin>
-                        </ComboBox>
-                        <ImageView fx:id="recognizeFaceImageView" fitHeight="206.0" fitWidth="562.0" pickOnBounds="true" preserveRatio="true" />
-                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-                           <children>
-                              <Button fx:id="recognizeTabCameraButton" mnemonicParsing="false" onAction="#recognizeTabCameraOnAction" text="Stop Camera">
-                                 <HBox.margin>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button fx:id="recognizeFaceButton" mnemonicParsing="false" onAction="#recognizeFaceOnAction" text="Recognize Face" />
-                           </children>
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                        </HBox>
-                     </children>
-                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </padding>
-                  </VBox>
-               </content>
-            </Tab>
-            </tabs>
-        </TabPane>
-    </center>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="pl.polsl.recognizer.controller.WindowController">
     <bottom>
-        <ToolBar prefHeight="40.0" prefWidth="318.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-           <items>
-               <Pane HBox.hgrow="ALWAYS" />
-               <Button fx:id="helpButton" onAction="#helpButtonOnAction" text="Help" />
-           </items>
+        <ToolBar prefHeight="40.0" prefWidth="318.0">
+            <items>
+                <HBox alignment="CENTER" prefHeight="36.0" prefWidth="585.0">
+                    <children>
+                        <Button fx:id="cameraButton" mnemonicParsing="false" onAction="#cameraOnAction"
+                                text="Stop Camera">
+                            <HBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </HBox.margin>
+                        </Button>
+                        <Button fx:id="addFaceButton" mnemonicParsing="false" onAction="#addFaceOnAction"
+                                text="Add Face">
+                            <HBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </HBox.margin>
+                        </Button>
+                        <Button fx:id="recognizeFaceButton" mnemonicParsing="false" onAction="#recognizeFaceOnAction"
+                                text="Recognize Face">
+                            <HBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </padding>
+                </HBox>
+            </items>
         </ToolBar>
     </bottom>
+    <top>
+        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+            <children>
+                <ComboBox fx:id="cameraComboBox" prefWidth="150.0" promptText="Choose Camera"/>
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </BorderPane.margin>
+        </HBox>
+    </top>
+    <center>
+        <BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0">
+            <center>
+                <ImageView fx:id="imageView" fitHeight="206.0" fitWidth="562.0" pickOnBounds="true" preserveRatio="true"
+                           BorderPane.alignment="CENTER"/>
+            </center>
+        </BorderPane>
+    </center>
 </BorderPane>

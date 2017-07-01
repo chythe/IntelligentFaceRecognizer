@@ -23,7 +23,7 @@ public class FaceParameterizer {
             if (facialKeypoints.length >= 9)
                 return calculateDistances(facialKeypoints);
         }
-        throw new NoFaceException();
+        throw new NoFaceException("No face on camera view");
     }
 
     private static Face calculateDistances(FacialKeypoint[] facialKeypoints) {

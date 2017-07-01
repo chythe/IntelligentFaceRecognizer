@@ -7,8 +7,6 @@ import com.github.sarxos.webcam.Webcam;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -20,6 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.WindowEvent;
 import pl.polsl.recognizer.exception.NoFaceException;
 import pl.polsl.recognizer.model.FaceParameterizer;
@@ -28,10 +27,7 @@ import pl.polsl.recognizer.model.RecognizerNeuralNetwork;
 public class WindowController implements Initializable {
 
     @FXML
-    private Button addTabCameraButton;
-
-    @FXML
-    private Button recognizeTabCameraButton;
+    private Button cameraButton;
 
     @FXML
     private Button addFaceButton;
@@ -40,25 +36,13 @@ public class WindowController implements Initializable {
     private Button recognizeFaceButton;
 
     @FXML
-    private Button helpButton;
+    ComboBox<WebCamInfo> cameraComboBox;
 
     @FXML
-    ComboBox<WebCamInfo> addTabCameraComboBox;
+    ImageView imageView;
 
     @FXML
-    ComboBox<WebCamInfo> recognizeTabCameraComboBox;
-
-    @FXML
-    ImageView addFaceImageView;
-
-    @FXML
-    ImageView recognizeFaceImageView;
-
-    @FXML
-    Tab addTab;
-
-    @FXML
-    TabPane tanPane;
+    BorderPane borderPane;
 
     private BufferedImage bufferedImage;
 
@@ -100,8 +84,9 @@ public class WindowController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        addTabCameraButton.setDisable(true);
+        cameraButton.setDisable(true);
         addFaceButton.setDisable(true);
+        recognizeFaceButton.setDisable(true);
         ObservableList<WebCamInfo> options = FXCollections.observableArrayList();
         int webCamCounter = 0;
         for (Webcam webcam : Webcam.getWebcams()) {
@@ -111,16 +96,23 @@ public class WindowController implements Initializable {
             options.add(webCamInfo);
             webCamCounter++;
         }
-        addTabCameraComboBox.setItems(options);
-        addTabCameraComboBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<WebCamInfo>() {
-
-            @Override
-            public void changed(ObservableValue<? extends WebCamInfo> arg0, WebCamInfo arg1, WebCamInfo arg2) {
-                if (arg2 != null) {
-                    initializeWebCam(arg2.getWebCamIndex());
-                }
+        cameraComboBox.setItems(options);
+        cameraComboBox.getSelectionModel().selectedItemProperty().addListener((arg0, arg1, arg2) -> {
+            if (arg2 != null) {
+                initializeWebCam(arg2.getWebCamIndex());
             }
         });
+        Platform.runLater(() -> setImageViewSize());
+    }
+
+    protected void setImageViewSize() {
+        double height = borderPane.getHeight();
+        double width = borderPane.getWidth();
+        imageView.setFitHeight(height);
+        imageView.setFitWidth(width);
+        imageView.prefHeight(height);
+        imageView.prefWidth(width);
+        imageView.setPreserveRatio(true);
     }
 
     protected void initializeWebCam(final int webCamIndex) {
@@ -137,7 +129,7 @@ public class WindowController implements Initializable {
                     webCam.open();
                 }
                 startWebCamStream();
-                addTabCameraButton.setDisable(false);
+                cameraButton.setDisable(false);
                 return null;
             }
 
@@ -154,14 +146,10 @@ public class WindowController implements Initializable {
                 while (!stopCamera) {
                     try {
                         if ((bufferedImage = webCam.getImage()) != null) {
-                            Platform.runLater(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    final Image fxImage = SwingFXUtils
-                                            .toFXImage(bufferedImage, null);
-                                    imageProperty.set(fxImage);
-                                }
+                            Platform.runLater(() -> {
+                                final Image fxImage = SwingFXUtils
+                                        .toFXImage(bufferedImage, null);
+                                imageProperty.set(fxImage);
                             });
                             bufferedImage.flush();
                         }
@@ -175,20 +163,22 @@ public class WindowController implements Initializable {
         Thread thread = new Thread(webCamTask);
         thread.setDaemon(true);
         thread.start();
-        addFaceImageView.imageProperty().bind(imageProperty);
+        imageView.imageProperty().bind(imageProperty);
     }
 
     @FXML
-    public void addTabCameraOnAction() {
+    public void cameraOnAction() {
         if (stopCamera) {
             stopCamera = false;
             addFaceButton.setDisable(true);
-            addTabCameraButton.setText("Stop Camera");
+            recognizeFaceButton.setDisable(true);
+            cameraButton.setText("Stop Camera");
             startWebCamStream();
         } else {
             stopCamera = true;
             addFaceButton.setDisable(false);
-            addTabCameraButton.setText("Start Camera");
+            recognizeFaceButton.setDisable(false);
+            cameraButton.setText("Start Camera");
         }
     }
 
@@ -197,64 +187,29 @@ public class WindowController implements Initializable {
         try {
             RecognizerNeuralNetwork.getInstance().addFace(
                     FaceParameterizer.detectFace(bufferedImage));
-        } catch (NoFaceException e) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText("No Face on Camera View");
-            alert.setContentText("Please Take Next One");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information");
+            alert.setHeaderText("Face added to the database");
             alert.showAndWait();
+        } catch (NoFaceException e) {
+            showNoFaceWarning(e.getMessage());
         }
-    }
-
-    @FXML
-    public void recognizeTabCameraOnAction() {
-        // TODO
-//        if (stopCamera) {
-//            stopCamera = false;
-//            startWebCamStream();
-//        } else {
-//            stopCamera = true;
-//        }
     }
 
     @FXML
     public void recognizeFaceOnAction() {
         // TODO
-    }
-
-    public static EventHandler<WindowEvent> confirmDialogCloseRequest() {
-        return new EventHandler<WindowEvent>() {
-
-            @Override
-            public void handle(WindowEvent windowEvent) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Exit");
-                alert.setHeaderText("Confirm");
-                alert.setContentText("Are you sure you want to exit?");
-                if (alert.showAndWait().get() == ButtonType.OK){
-                    Platform.exit();
-                    System.exit(0);
-                } else
-                    windowEvent.consume();
-            }
-        };
-    }
-
-    @FXML
-    public void exitMenuItemOnAction() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Exit");
-        alert.setHeaderText("Confirm");
-        alert.setContentText("Are you sure you want to exit?");
-        if (alert.showAndWait().get() == ButtonType.OK){
-            Platform.exit();
-            System.exit(0);
+        try {
+            String name = RecognizerNeuralNetwork.getInstance().recognizeFace(
+                    FaceParameterizer.detectFace(bufferedImage));
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information");
+            alert.setHeaderText("Face was recognized as:");
+            alert.setContentText(name);
+            alert.showAndWait();
+        } catch (NoFaceException e) {
+            showNoFaceWarning(e.getMessage());
         }
-    }
-
-    @FXML
-    public void recognizeFaceButtonOnAction() {
-        // TODO
 //        RecognizerNeuralNetwork rocognizer = new RecognizerNeuralNetwork();
 //        rocognizer.learnNeuralNetwork(inputPicturePathTextField.getText());
 //        DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -265,8 +220,24 @@ public class WindowController implements Initializable {
 //        }
     }
 
-    @FXML
-    public void helpButtonOnAction() {
-        // TODO
+    private void showNoFaceWarning(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Warning");
+        alert.setHeaderText(message);
+        alert.showAndWait();
+    }
+
+    public static EventHandler<WindowEvent> confirmDialogCloseRequest() {
+        return windowEvent -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Exit");
+            alert.setHeaderText("Confirm");
+            alert.setContentText("Are you sure you want to exit?");
+            if (alert.showAndWait().get() == ButtonType.OK){
+                Platform.exit();
+                System.exit(0);
+            } else
+                windowEvent.consume();
+        };
     }
 }
