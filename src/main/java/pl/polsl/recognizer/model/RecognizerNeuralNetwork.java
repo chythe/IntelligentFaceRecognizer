@@ -7,9 +7,6 @@ import org.neuroph.core.learning.DataSetRow;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.util.TransferFunctionType;
 import pl.polsl.recognizer.exception.NoFaceException;
-
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class RecognizerNeuralNetwork {

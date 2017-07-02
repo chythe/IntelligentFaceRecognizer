@@ -1,7 +1,5 @@
 package pl.polsl.recognizer.database;
 
-import com.google.common.collect.Lists;
-import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -9,7 +7,6 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import pl.polsl.recognizer.model.Face;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,15 +33,6 @@ public class DatabaseConnector {
             System.out.println(e.getMessage());
         }
     }
-
-//    public Face(double distanceEyes,
-//                double distanceLeftEyeMouth,
-//                double distanceRightEyeMouth,
-//                double distanceLeftEyeNose,
-//                double distanceRightEyeNose,
-//                double distanceMouthNose,
-//                double distanceEyesNose,
-//                double widthNose) {
 
     public void addFace(Face face) {
         Document document = new Document()
