@@ -51,24 +51,29 @@ public class RecognizerNeuralNetwork {
         System.out.println("Add face time: " + duration / 1000000 / 1000 + " seconds (" + duration / 1000000 + " milliseconds).");
     }
 
-    public String recognizeFace(Face face) throws NoFaceException {
+    public int recognizeFace(Face face) throws NoFaceException {
         long startTime = System.nanoTime();
-        neuralNetwork = new NeuralNetwork();
-        if (neuralNetwork.load("intelligent_face_recognizer.nnet") == null)
+        if ((neuralNetwork = NeuralNetwork.load("intelligent_face_recognizer.nnet")) == null)
             throw new NoFaceException("No neural network file");
-        try {
-            // TODO tu leci wyjątek
-            neuralNetwork.setInput(new DataSetRow(normalize(face.getAll(), face.getMinParam(), face.getMaxParam())).getInput());
-        } catch (VectorSizeMismatchException e) {
-            e.printStackTrace();
-        }
+        neuralNetwork.setInput(normalize(face.getAll(), face.getMinParam(), face.getMaxParam()));
         neuralNetwork.calculate();
-        System.out.print("Input: " + Arrays.toString(normalize(face.getAll(), face.getMinParam(), face.getMaxParam())));
-        System.out.println(" Output: " + Arrays.toString(neuralNetwork.getOutput()) );
+        double[] results = neuralNetwork.getOutput();
+        System.out.println("Results: " + Arrays.toString(results));
+        int result = -1;
+        for (int i = 0; i < results.length; i++) {
+            if (results[i] > 0.5) {
+                if (-1 == result || results[i] > results[result]) {
+                    result = i;
+                }
+            }
+        }
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
         System.out.println("Recognize face time: " + duration / 1000000 / 1000 + " seconds (" + duration / 1000000 + " milliseconds).");
-        throw new NoFaceException("No face in database");
+        if (result != -1)
+            return result;
+        else
+            throw new NoFaceException("No face in database");
     }
 
     private double getMinParam(List<Face> faces) {

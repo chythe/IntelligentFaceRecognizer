@@ -219,11 +219,12 @@ public class WindowController implements Initializable {
         // TODO
         try {
             Face face = FaceParameterizer.detectFace(bufferedImage);
-            String name = RecognizerNeuralNetwork.getInstance().recognizeFace(face);
+            int faceIndex = RecognizerNeuralNetwork.getInstance().recognizeFace(face);
+            face = DatabaseConnector.getInstance().getAllFaces().get(faceIndex);
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Information");
             alert.setHeaderText("Face was recognized as:");
-            alert.setContentText(name);
+            alert.setContentText(face.getName());
             alert.showAndWait();
         } catch (NoFaceException e) {
             showWarning(e.getMessage());
